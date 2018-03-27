@@ -56,7 +56,7 @@ def parseSongs(songList):
 
     return parsedSongList
 
-def printSongInfo(song):
+def printSong(song):
     
     try:
         print("Title: ", song['title'])
@@ -64,8 +64,19 @@ def printSongInfo(song):
         if song['featuring']:
             print("Featuring: ", song['featuring'])
         print("Url: ", URL+song['view_url'])
+
     except Exception as e:
-        print("Failed to pring song info!\n", e)
+        print("Failed to print song info!\n", e)
+        sys.exit(0)
+
+def printSongs(songList):
+    
+    try:
+        for song in songList:
+            print(song['artist'], "-",  song['title'], "(feat. "+song['featuring']+")")
+    
+    except Exception as e:
+        print("Failed to print song info!\n", e)
         sys.exit(0)
 
 if __name__ == "__main__":
@@ -75,5 +86,7 @@ if __name__ == "__main__":
     
     parsedSongs = parseSongs(songs)
 
-    printSongInfo(parsedSongs[0])
-
+    firstSong = parsedSongs[0]
+    
+    # pretty print json
+    print(json.dumps(firstSong, indent=4, sort_keys=True))
