@@ -2,7 +2,7 @@
     Kenneth Bailey
     3/23/18
 
-    Scraper for an undisclosed music site.
+    Scraper for undisclosed music site #1.
 
 '''
 
@@ -15,7 +15,7 @@ import configparser
 config = configparser.ConfigParser()
 config.read('config.ini')
 
-URL = config['Site']['Url']
+URL = config['Site1']['Url']
 HEADER = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
 
 def getSongs():
@@ -77,6 +77,24 @@ def printSongs(songList):
     
     except Exception as e:
         print("Failed to print song info!\n", e)
+        sys.exit(0)
+
+def getSongDownloadLink(songUrl):
+    
+    r.get(songUrl, headers=HEADER, timeout=5)
+    
+    if r.status_code == 200:
+        try:
+            
+            song = re.findall('download_from_url|(.+?)\'', r.text)
+            print(song)
+
+        except Exception as e:
+            print("Failed to find song download url!\n", e)
+            sys.exit(0)
+
+    else:
+        print("Failed to get song via url:", songUrl)
         sys.exit(0)
 
 if __name__ == "__main__":
