@@ -11,11 +11,14 @@ import re
 import sys
 import json
 import configparser
+import csv 
+import datetime
 
 config = configparser.ConfigParser()
 config.read('config.ini')
 
 URL = config['Site1']['Url']
+FILENAME = config['Site1']['Filename']
 HEADER = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
 
 def getSongs():
@@ -86,7 +89,7 @@ def getSongDownloadLink(songUrl):
     if r.status_code == 200:
         try:
             
-            song = re.findall('download_from_url|(.+?)\'', r.text)
+            song = re.findall('download_from_url|(.+?)', r.text)
             print(song)
 
         except Exception as e:
@@ -97,14 +100,37 @@ def getSongDownloadLink(songUrl):
         print("Failed to get song via url:", songUrl)
         sys.exit(0)
 
+def songListToCSV(songList):
+   
+    try:
+        datetimePart = datetime.datetime.now().strftime("_%H%M-%m%d%Y")
+        filename = FILENAME+datetimePart+".csv"
+
+        songData = open(filename, 'w')
+
+        csvWriter = csv.writer(songData)
+
+        for i, song in enumerate(songList):
+            if i == 0:
+                header = song.keys()
+                csvWriter.writerow(header)
+            else:
+                csvWriter.writerow(song.values())
+
+        songData.close()
+
+    except Exception as e:
+        print("Failed to create CSV of songs", e)
+        sys.exit(0)
+
 if __name__ == "__main__":
-    
+   
     songs = getSongs()
     print("# Songs Found: ", len(songs))
     
     parsedSongs = parseSongs(songs)
 
-    firstSong = parsedSongs[0]
+    songListToCSV(parsedSongs)
     
     # pretty print json
-    print(json.dumps(firstSong, indent=4, sort_keys=True))
+    #print(json.dumps(firstSong, indent=4, sort_keys=True))
