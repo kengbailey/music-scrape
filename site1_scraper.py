@@ -13,6 +13,7 @@ import json
 import configparser
 import csv 
 import datetime
+import os
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -118,6 +119,7 @@ def songListToCSV(songList):
                 csvWriter.writerow(song.values())
 
         songData.close()
+        return os.path.realpath(songData.name)
 
     except Exception as e:
         print("Failed to create CSV of songs", e)
@@ -130,7 +132,8 @@ if __name__ == "__main__":
     
     parsedSongs = parseSongs(songs)
 
-    songListToCSV(parsedSongs)
-    
+    csvPath = songListToCSV(parsedSongs)
+    print("CSV Path: ", csvPath)
+
     # pretty print json
     #print(json.dumps(firstSong, indent=4, sort_keys=True))
