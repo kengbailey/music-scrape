@@ -125,15 +125,30 @@ def songListToCSV(songList):
         print("Failed to create CSV of songs", e)
         sys.exit(0)
 
+def songListToJson(songList):
+    
+    try:
+        tempJson = json.dumps(songList)
+        return tempJson
+    
+    except Exception as e:
+        print("Failed to convert songList to Json", e)
+        sys.exit(0)
+
 if __name__ == "__main__":
    
+    
     songs = getSongs()
     print("# Songs Found: ", len(songs))
     
     parsedSongs = parseSongs(songs)
-
+    
+    # save songs locally
     csvPath = songListToCSV(parsedSongs)
     print("CSV Path: ", csvPath)
+    
+    # songs to json
+    jsonSongs = songListToJson(parsedSongs)
 
     # pretty print json
     #print(json.dumps(firstSong, indent=4, sort_keys=True))
