@@ -151,4 +151,4 @@ if __name__ == "__main__":
     jsonSongs = songListToJson(parsedSongs)
 
     # pretty print json
-    #print(json.dumps(firstSong, indent=4, sort_keys=True))
+    #print(json.dumps(parsedSongs[0], indent=4, sort_keys=True))
