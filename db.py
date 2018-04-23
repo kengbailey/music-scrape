@@ -9,10 +9,18 @@
 import psycopg2
 import os
 import sys
+import configparser
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+DBNAME = config['DB']['DbName']
+USER = config['DB']['User']
+HOST = config['DB']['Host']
+PW = config['DB']['Password']
 
 def connectDb():
     try:
-        conn_str = "dbname='postgres' user='syran' host='192.168.1.242' password='sk8erb01' "
+        conn_str = "dbname={} user={} host={} password={}".format(DBNAME, USER, HOST, PW)
         conn = psycopg2.connect(conn_str)
         print("Successfully connected to db!")
         return conn
