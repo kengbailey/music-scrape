@@ -14,6 +14,7 @@ import configparser
 import csv 
 import datetime
 import os
+from api import sendJsonToUrl
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -21,6 +22,7 @@ config.read('config.ini')
 URL = config['Site1']['Url']
 FILENAME = config['Site1']['Filename']
 HEADER = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
+#SITE1POST = ['API']['Site1Post']
 
 def getSongs():
     
@@ -136,7 +138,7 @@ def songListToJson(songList):
         sys.exit(0)
 
 if __name__ == "__main__":
-   
+    
     
     songs = getSongs()
     print("# Songs Found: ", len(songs))
@@ -149,6 +151,9 @@ if __name__ == "__main__":
     
     # songs to json
     jsonSongs = songListToJson(parsedSongs)
+    
+    #testing
+    sendJsonToUrl("http://localhost:3000/ddrip", jsonSongs)
 
     # pretty print json
     #print(json.dumps(parsedSongs[0], indent=4, sort_keys=True))
