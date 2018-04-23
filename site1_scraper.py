@@ -14,7 +14,8 @@ import configparser
 import csv 
 import datetime
 import os
-from api import sendJsonToUrl
+from api import *
+from db import *
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -145,15 +146,18 @@ if __name__ == "__main__":
     
     parsedSongs = parseSongs(songs)
     
-    # save songs locally
-    csvPath = songListToCSV(parsedSongs)
-    print("CSV Path: ", csvPath)
+    # songs to db
     
+
+    # save songs locally
+    #csvPath = songListToCSV(parsedSongs)
+    #print("CSV Path: ", csvPath)
+        
     # songs to json
-    jsonSongs = songListToJson(parsedSongs)
+    #jsonSongs = songListToJson(parsedSongs)
     
     #testing
-    sendJsonToUrl("http://localhost:3000/ddrip", jsonSongs)
+    #sendJsonToUrl("http://localhost:3000/ddrip", jsonSongs)
 
     # pretty print json
     #print(json.dumps(parsedSongs[0], indent=4, sort_keys=True))

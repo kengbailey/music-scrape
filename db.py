@@ -1,0 +1,69 @@
+"""
+    Kenneth Bailey
+    4/23/18
+
+    Notes:
+
+"""
+
+import psycopg2
+import os
+import sys
+
+def connectDb():
+    try:
+        conn_str = "dbname='postgres' user='syran' host='192.168.1.242' password='sk8erb01' "
+        conn = psycopg2.connect(conn_str)
+        print("Successfully connected to db!")
+        return conn
+
+    except Exception as e:
+        print("Failed to connect to db!", e)
+
+def songListToDb(conn, songList):
+    
+    try:
+        for song in songList:
+            with conn.cursor() as cur:
+                # build sql query
+                sql = '''
+                insert into ddrip.rawdailyrips(amazon, artist, creat_time,
+                                                song_desc, dislikes, download_block,
+                                                download_url, featuring, file, full_artist,
+                                                google, image, itunes, likes, live_time,
+                                                live_time_day, live_time_f, priority, rating,
+                                                secondary_title, thumb_56, thumb_url, thumb_video,
+                                                title, song_type, update_time, url, view_url,
+                                                view_mobile_url, views)
+                values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
+                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                '''
+
+                # execute sql query
+                cur.execute(sql, (song['amazon'], song['artist'], song['create_time'], song['desc'],
+                                    song['dislikes'], song['download_block'], song['download_url'], 
+                                    song['featuring'], song['file'], song['full_artist'], song['google'],
+                                    song['image'], song['itunes'], song['likes'], song['live_time'],
+                                    song['live_time_day'], song['live_time_f'], song['priority'],
+                                    song['rating'], song['secondary_title'], song['thumb_56'],
+                                    song['thumb_url'], song['thumb_video'], song['title'], song['song_type'],
+                                    song['update_time'], song['url'], song['view_url'], song['view_mobile_url'],
+                                    song['views']))
+
+        print("inserted: "+len(songList)+" songs")
+    
+    except Exception as e:
+        print("Failed to insert all songs!", e)
+
+if __name__ == "__main__":  
+    
+    # connect db
+    conn = connectDb()
+    cur = conn.cursor()
+
+    #
+    cur.execute("select * from ddrip.rawdailyrips")
+    one = cur.fetchall()
+    print(one)
+    conn.close()
