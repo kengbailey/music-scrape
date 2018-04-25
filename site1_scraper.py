@@ -13,9 +13,10 @@ import json
 import configparser
 import csv 
 import datetime
-import os
+from os import path
 from api import *
 from db import *
+import time
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -23,10 +24,10 @@ config.read('config.ini')
 URL = config['Site1']['Url']
 FILENAME = config['Site1']['Filename']
 HEADER = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'}
-#SITE1POST = ['API']['Site1Post']
 
 def getSongs():
-    
+    """ Retrieves all songs currently on the first page of Site1."""
+
     r = requests.get(URL, headers=HEADER, timeout=5)
     
     if r.status_code == 200:
@@ -35,7 +36,14 @@ def getSongs():
             songs = re.findall('rows.push\((.+?)\);', r.text)
             
             if songs:
-                return songs
+                newSongs = []
+
+                for song in songs:
+                    temp = json.loads(song)
+                    newSongs.append(temp)
+
+                return newSongs
+
             else:
                 print("Failed to find any songs on page!")
                 sys.exit(0)
@@ -48,23 +56,9 @@ def getSongs():
         print("Url Fetch Failed! Status Code: ", r.status_code)
         sys.exit(0)
 
-def parseSongs(songList):
-    
-    parsedSongList = []
-
-    try:
-        for song in songList:
-            x = json.loads(song)
-            parsedSongList.append(x)
-
-    except Exception as e:
-        print("Failed to parse songs!\n", e)
-        sys.exit(0)
-
-    return parsedSongList
-
 def printSong(song):
-    
+    """ Prints chosen bits of a particular song """
+
     try:
         print("Title: ", song['title'])
         print("Artist: ", song['artist'])
@@ -77,7 +71,8 @@ def printSong(song):
         sys.exit(0)
 
 def printSongs(songList):
-    
+    """ Prints chosen bits of all songs """
+
     try:
         for song in songList:
             print(song['artist'], "-",  song['title'], "(feat. "+song['featuring']+")")
@@ -87,12 +82,12 @@ def printSongs(songList):
         sys.exit(0)
 
 def getSongDownloadLink(songUrl):
-    
+    """ Gets the song download URL of a particular song """
+
     r.get(songUrl, headers=HEADER, timeout=5)
     
     if r.status_code == 200:
-        try:
-            
+        try:            
             song = re.findall('download_from_url|(.+?)', r.text)
             print(song)
 
@@ -105,7 +100,8 @@ def getSongDownloadLink(songUrl):
         sys.exit(0)
 
 def songListToCSV(songList):
-   
+    """ Outputs all songs to a csv file """
+
     try:
         datetimePart = datetime.datetime.now().strftime("_%H%M-%m%d%Y")
         filename = FILENAME+datetimePart+".csv"
@@ -122,42 +118,24 @@ def songListToCSV(songList):
                 csvWriter.writerow(song.values())
 
         songData.close()
-        return os.path.realpath(songData.name)
+        return path.realpath(songData.name)
 
     except Exception as e:
         print("Failed to create CSV of songs", e)
         sys.exit(0)
 
-def songListToJson(songList):
-    
-    try:
-        tempJson = json.dumps(songList)
-        return tempJson
-    
-    except Exception as e:
-        print("Failed to convert songList to Json", e)
-        sys.exit(0)
-
 if __name__ == "__main__":
     
-    
+    # run
+    start = time.time()
     songs = getSongs()
-    print("# Songs Found: ", len(songs))
-    
-    parsedSongs = parseSongs(songs)
-    
-    # songs to db
-    
+    dbConn = connectDb()
+    site1ToDb(dbConn, songs)
+    print("Successfully scraped and inserted {} songs into DB!\nTime Elapsed: {}s ".format(len(songs), time.time()-start))
 
     # save songs locally
     #csvPath = songListToCSV(parsedSongs)
     #print("CSV Path: ", csvPath)
-        
-    # songs to json
-    #jsonSongs = songListToJson(parsedSongs)
-    
-    #testing
-    #sendJsonToUrl("http://localhost:3000/ddrip", jsonSongs)
 
     # pretty print json
     #print(json.dumps(parsedSongs[0], indent=4, sort_keys=True))
