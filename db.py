@@ -20,17 +20,17 @@ PW = config['DB']['Password']
 
 # insertion sql queries
 SITE1SQLQUERY = '''
-insert into ddrip.rawdailyrips(amazon, artist, creat_time,
+insert into ddrip.rawdailyrips(amazon, artist, create_time,
                                 song_desc, dislikes, download_block,
                                 download_url, featuring, file, full_artist,
                                 google, image, itunes, likes, live_time,
                                 live_time_day, live_time_f, priority, rating,
                                 secondary_title, thumb_56, thumb_url, thumb_video,
                                 title, song_type, update_time, url, view_url,
-                                view_mobile_url, views)
+                                view_mobile_url, views, site_id)
 values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 
 def connectDb():
@@ -48,30 +48,29 @@ def site1ToDb(conn, songList):
     try:
         for song in songList:
             with conn.cursor() as cur:
-                # execute sql query
+                # execute sql query                
                 cur.execute(SITE1SQLQUERY, (song['amazon'], song['artist'], song['create_time'], song['desc'],
                                     song['dislikes'], song['download_block'], song['download_url'], 
                                     song['featuring'], song['file'], song['full_artist'], song['google'],
                                     song['image'], song['itunes'], song['likes'], song['live_time'],
                                     song['live_time_day'], song['live_time_f'], song['priority'],
                                     song['rating'], song['secondary_title'], song['thumb_56'],
-                                    song['thumb_url'], song['thumb_video'], song['title'], song['song_type'],
+                                    song['thumb_url'], song['thumb_video'], song['title'], song['type'],
                                     song['update_time'], song['url'], song['view_url'], song['view_mobile_url'],
-                                    song['views'],))
+                                    song['views'],song['id'],))
+                conn.commit()
 
-        print("Successfully inserted {} songs!".format(len(songs)))                
+        print("Successfully inserted {} songs!".format(len(songList)))                
 
     except Exception as e:
-        print("Failed to insert all songs!", e)
+        print("Failed to insert all songs! -->", e)
 
 if __name__ == "__main__":  
     
-    # connect db
+    # run
     conn = connectDb()
     cur = conn.cursor()
-
-    #
-    cur.execute("select * from ddrip.rawdailyrips")
-    one = cur.fetchall()
-    print(one)
+    cur.execute("select * from ddrip.rawdailyrips order by id desc limit 1")
+    one = cur.fetchone()
     conn.close()
+    print(one)
