@@ -14,7 +14,6 @@ import configparser
 import csv 
 import datetime
 from os import path
-from api import *
 from db import *
 import time
 
@@ -33,17 +32,10 @@ def getSongs():
     if r.status_code == 200:
         
         try:
-            songs = re.findall('rows.push\((.+?)\);', r.text)
-            
-            if songs:
-                newSongs = []
-
-                for song in songs:
-                    temp = json.loads(song)
-                    newSongs.append(temp)
-
+            songs = re.findall('rows.push\((.+?)\);', r.text)                        
+            newSongs = [ json.loads(x) for x in songs ]
+            if len(newSongs) > 0:
                 return newSongs
-
             else:
                 print("Failed to find any songs on page!")
                 sys.exit(0)
