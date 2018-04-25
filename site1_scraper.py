@@ -14,7 +14,6 @@ import configparser
 import csv 
 import datetime
 from os import path
-from api import *
 from db import *
 import time
 
