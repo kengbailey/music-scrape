@@ -27,10 +27,10 @@ insert into ddrip.rawdailyrips(amazon, artist, create_time,
                                 live_time_day, live_time_f, priority, rating,
                                 secondary_title, thumb_56, thumb_url, thumb_video,
                                 title, song_type, update_time, url, view_url,
-                                view_mobile_url, views, site_id)
+                                view_mobile_url, views, site_id, num)
 values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 
 def connectDb():
@@ -44,11 +44,17 @@ def connectDb():
         print("Failed to connect to db!", e)
 
 def site1ToDb(conn, songList):
-    
+    num = None
     try:
+        # get rip num
+        with conn.cursor() as cur:
+            cur.execute("select num from ddrip.rawdailyrips order by id desc limit 1")
+            one = cur.fetchone()
+            num = int(one[0])+1
+
+        # execute sql query                
         for song in songList:
             with conn.cursor() as cur:
-                # execute sql query                
                 cur.execute(SITE1SQLQUERY, (song['amazon'], song['artist'], song['create_time'], song['desc'],
                                     song['dislikes'], song['download_block'], song['download_url'], 
                                     song['featuring'], song['file'], song['full_artist'], song['google'],
@@ -57,7 +63,7 @@ def site1ToDb(conn, songList):
                                     song['rating'], song['secondary_title'], song['thumb_56'],
                                     song['thumb_url'], song['thumb_video'], song['title'], song['type'],
                                     song['update_time'], song['url'], song['view_url'], song['view_mobile_url'],
-                                    song['views'],song['id'],))
+                                    song['views'],song['id'], num))
                 conn.commit()
 
         print("Successfully inserted {} songs!".format(len(songList)))                
