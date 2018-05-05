@@ -80,8 +80,13 @@ def getSongDownloadLink(songUrl):
     
     if r.status_code == 200:
         try:            
-            song = re.findall('download_from_url|(.+?)', r.text)
-            print(song)
+            soup = BeautifulSoup(r.text,"html.parser")
+            song = soup.find_all("div", class_="jp-progress")            
+            realSong = [x for x in song if "url" in str(x)]
+            test = str(realSong).split("|")
+            realerSong = [x for x in test if "mp3" in x][0]
+            link = realerSong.split("')")[0]
+            return link 
 
         except Exception as e:
             print("Failed to find song download url!\n", e)
