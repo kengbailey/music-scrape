@@ -12,6 +12,7 @@ import sys
 import json
 import configparser
 import datetime
+from bs4 import BeautifulSoup
 from db import *
 import time
 
@@ -73,9 +74,20 @@ def getAlbums():
     if r.status_code == 200:
         
         try:
-            albums = None
+            albums = []            
+            soup = BeautifulSoup(r.text, "html.parser")
+            album = soup.find_all("div", class_="duv")
+            for i,al in enumerate(album):   
+                temp = {}
+                temp['link'] = al.find_all("a")[0]['href']
+                temp['album'] = al.find_all("span", class_="title")[0].text
+                albums.append(temp)
 
-            return albums
+            if len(albums) > 0:
+                return albums
+            else:
+                print("No albums found on site2!")
+                sys.exit(0)
         
         except Exception as e:
             print("Failed to get albums from site2\n", e)
