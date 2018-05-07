@@ -33,6 +33,21 @@ values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
         %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 '''
 
+SITE2QUERY_SINGLES = '''
+insert into nineclacks.rawsingle(name, link)
+values (%s, %s)
+'''
+
+SITE2QUERY_ALBUMS = '''
+insert into nineclacks.rawalbum(name, link)
+values(%s, %s)
+'''
+
+SITE2QUERY_MIXTAPES = '''
+insert into nineclacks.rawmixtape(name, link)
+values(%s, %s)
+'''
+
 def connectDb():
     try:
         conn_str = "dbname={} user={} host={} password={}".format(DBNAME, USER, HOST, PW)
