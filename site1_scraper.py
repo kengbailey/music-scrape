@@ -51,27 +51,17 @@ def getSongs():
 def printSong(song):
     """ Prints chosen bits of a particular song """
 
-    try:
-        print("Title: ", song['title'])
-        print("Artist: ", song['artist'])
-        if song['featuring']:
-            print("Featuring: ", song['featuring'])
-        print("Url: ", URL+song['view_url'])
-
-    except Exception as e:
-        print("Failed to print song info!\n", e)
-        sys.exit(0)
+    print("Title: ", song['title'])
+    print("Artist: ", song['artist'])
+    if song['featuring']:
+        print("Featuring: ", song['featuring'])
+    print("Url: ", URL+song['view_url'])
 
 def printSongs(songList):
     """ Prints chosen bits of all songs """
 
-    try:
-        for song in songList:
-            print(song['artist'], "-",  song['title'], "(feat. "+song['featuring']+")")
-    
-    except Exception as e:
-        print("Failed to print song info!\n", e)
-        sys.exit(0)
+    for song in songList:
+        print(song['artist'], "-",  song['title'], "(feat. "+song['featuring']+")")
 
 def getSongDownloadLink(songUrl):
     """ Gets the song download URL of a particular song """
