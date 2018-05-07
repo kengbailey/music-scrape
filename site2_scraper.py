@@ -9,7 +9,6 @@
 import requests
 import re
 import sys
-import json
 import configparser
 import datetime
 from bs4 import BeautifulSoup
@@ -33,10 +32,20 @@ def getSingles():
     if r.status_code == 200:
 
         try:
-            songs = None
-            
+            singles = []            
+            soup = BeautifulSoup(r.text, "html.parser")
+            single = soup.find_all("div", class_="duv")
+            for i,al in enumerate(single):   
+                temp = {}
+                temp['link'] = al.find_all("a")[0]['href']
+                temp['album'] = al.find_all("span", class_="title")[0].text
+                singles.append(temp)
 
-            return songs
+            if len(singles) > 0:
+                return singles
+            else:
+                print("No albums found on site2!")
+                sys.exit(0)
 
         except Exception as e:
             print("Failed to get Singles from site2\n", e)
@@ -54,9 +63,20 @@ def getMixtapes():
     if r.status_code == 200:
 
         try:
-            mixtapes = None
+            mixtapes = []            
+            soup = BeautifulSoup(r.text, "html.parser")
+            tapes = soup.find_all("div", class_="duv")
+            for i,al in enumerate(tapes):   
+                temp = {}
+                temp['link'] = al.find_all("a")[0]['href']
+                temp['album'] = al.find_all("span", class_="title")[0].text
+                mixtapes.append(temp)
 
-            return mixtapes
+            if len(mixtapes) > 0:
+                return mixtapes
+            else:
+                print("No albums found on site2!")
+                sys.exit(0)
 
         except Exception as e:
             print("Failed to get mixtapes from site2\n", e)
