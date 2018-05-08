@@ -34,18 +34,18 @@ values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
 '''
 
 SITE2QUERY_SINGLES = '''
-insert into nineclacks.rawsingle(name, link)
-values (%s, %s)
+insert into nineclacks.rawsingle(name, link, num)
+values (%s, %s, %s)
 '''
 
 SITE2QUERY_ALBUMS = '''
-insert into nineclacks.rawalbum(name, link)
-values(%s, %s)
+insert into nineclacks.rawalbum(name, link, num)
+values(%s, %s, %s)
 '''
 
 SITE2QUERY_MIXTAPES = '''
-insert into nineclacks.rawmixtape(name, link)
-values(%s, %s)
+insert into nineclacks.rawmixtape(name, link, num)
+values(%s, %s, %s)
 '''
 
 def connectDb():
@@ -85,6 +85,34 @@ def site1ToDb(conn, songList):
 
     except Exception as e:
         print("Failed to insert all songs! -->", e)
+
+def site2SinglesToDB(conn, singles):
+    rip_num = None
+
+    try:
+        # get rip num
+        with conn.cursor() as cur:
+            cur.execute("select rip_num from nineclacks.single order by id desc limit 1")
+            one = cur.fetchone()
+            rip_num = int(one[0]) + 1
+
+        # execute insert
+        for single in singles:
+            with conn.cursor() as cur:
+                cur.execute(SITE2QUERY_SINGLES, (single['name'], single['link'], rip_num))
+                conn.commit()
+
+        print("Successfully inserted {} singles!".format(len(singles)))
+
+    except Exception as e:
+        print("Failed to insert all singles from site2! --> ", e)
+
+def site2AlbumsToDB(conn, albums):
+
+    print()
+
+def site2MixtapesToDB(conn, albums):
+    
 
 if __name__ == "__main__":  
     
