@@ -34,17 +34,17 @@ values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
 '''
 
 SITE2QUERY_SINGLES = '''
-insert into nineclacks.rawsingle(name, link, num)
+insert into nineclacks.singles(name, link, num)
 values (%s, %s, %s)
 '''
 
 SITE2QUERY_ALBUMS = '''
-insert into nineclacks.rawalbum(name, link, num)
+insert into nineclacks.albums(name, link, num)
 values(%s, %s, %s)
 '''
 
 SITE2QUERY_MIXTAPES = '''
-insert into nineclacks.rawmixtape(name, link, num)
+insert into nineclacks.mixtapes(name, link, num)
 values(%s, %s, %s)
 '''
 
@@ -86,33 +86,38 @@ def site1ToDb(conn, songList):
     except Exception as e:
         print("Failed to insert all songs! -->", e)
 
-def site2SinglesToDB(conn, singles):
+def site2RipsToDB(conn, rips):
     rip_num = None
+    context = None
+    sql = None
+
+    if 'album' in rips[0].keys():
+        context = "album"
+        sql = SITE2QUERY_ALBUMS
+    elif 'single' in rips[0].keys():
+        context = "single"
+        sql = SITE2QUERY_SINGLES
+    else:
+        context = "mixtape"
+        sql = SITE2QUERY_MIXTAPES
 
     try:
         # get rip num
         with conn.cursor() as cur:
-            cur.execute("select rip_num from nineclacks.single order by id desc limit 1")
+            cur.execute("select num from nineclacks.{}s order by id desc limit 1".format(context))
             one = cur.fetchone()
             rip_num = int(one[0]) + 1
 
         # execute insert
-        for single in singles:
+        for rip in rips:
             with conn.cursor() as cur:
-                cur.execute(SITE2QUERY_SINGLES, (single['name'], single['link'], rip_num))
+                cur.execute(sql, (rip[context], rip['link'], rip_num))
                 conn.commit()
 
-        print("Successfully inserted {} singles!".format(len(singles)))
+        print("Successfully inserted {} {}s!".format(len(rips), context))
 
     except Exception as e:
-        print("Failed to insert all singles from site2! --> ", e)
-
-def site2AlbumsToDB(conn, albums):
-
-    print()
-
-def site2MixtapesToDB(conn, albums):
-    
+        print("Failed to insert {}s from site2! --> ".format(context), e)
 
 if __name__ == "__main__":  
     
