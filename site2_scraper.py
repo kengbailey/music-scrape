@@ -38,7 +38,7 @@ def getSingles():
             for i,al in enumerate(single):   
                 temp = {}
                 temp['link'] = al.find_all("a")[0]['href']
-                temp['album'] = al.find_all("span", class_="title")[0].text
+                temp['single'] = al.find_all("span", class_="title")[0].text
                 singles.append(temp)
 
             if len(singles) > 0:
@@ -69,7 +69,7 @@ def getMixtapes():
             for i,al in enumerate(tapes):   
                 temp = {}
                 temp['link'] = al.find_all("a")[0]['href']
-                temp['album'] = al.find_all("span", class_="title")[0].text
+                temp['mixtape'] = al.find_all("span", class_="title")[0].text
                 mixtapes.append(temp)
 
             if len(mixtapes) > 0:
@@ -119,5 +119,11 @@ def getAlbums():
 
 if __name__ == "__main__":
    
-   # run
-   print(getAlbums())
+    # run
+    singles = getSingles()
+    albums = getAlbums()
+    mixtapes = getMixtapes()
+    conn = connectDb()
+    site2RipsToDB(conn, mixtapes)
+    site2RipsToDB(conn, albums)
+    site2RipsToDB(conn, singles)
